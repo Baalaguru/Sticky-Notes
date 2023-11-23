@@ -1,24 +1,138 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <link rel="stylesheet" type="text/css" href="Style.css" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notes Editor</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css"
+    />
+    <style>
+      #add-notes-btn {
+        width: 150px;
+        height: 50px;
+        font-weight: bold;
+        border-width: 3px;
+      }
+    </style>
   </head>
   <body>
-    <div id="app">
-      <div id="notes-container">
-        <!-- Sticky Notes will be dynamically added here -->
+    <br /><br />
+    <header class="container-fluid text-center">
+      <section>
+        <!-- Button trigger modal -->
+        <button
+          type="button"
+          class="btn btn-outline-warning"
+          id="add-notes-btn"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
+        >
+          <i class="bi bi-file-earmark-plus-fill"></i>
+          <span>Add a Note</span>
+        </button>
+      </section>
+    </header>
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">
+              Add a new note
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <div class="input-group mb-3 flex-nowrap">
+              <!-- <span class="input-group-text" id="addon-wrapping">@</span> -->
+              <input
+                type="text"
+                class="form-control"
+                id="add-note-title"
+                placeholder="Note Title"
+                aria-label="Note Title"
+                aria-describedby="addon-wrapping"
+              />
+            </div>
+            <div class="input-group">
+              <span class="input-group-text">With textarea</span>
+              <textarea
+                id="add-note-content"
+                class="form-control"
+                aria-label="With textarea"
+                rows="5"
+              ></textarea>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary" onclick="addNote()">
+              Save changes
+            </button>
+          </div>
+        </div>
       </div>
-      <button id="create-button" onclick="createNote()">Create Note</button>
     </div>
 
-    <div id="modal" class="hidden">
-      <div id="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <textarea id="note-text"></textarea>
-        <button id="save-button" onclick="saveNote()">Save</button>
-      </div>
-    </div>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      window.addEventListener("DOMContentLoaded", function () {
+        let idb = indexedDB.open("notes-editor", 1);
+        idb.onupgradeneeded = () => {
+          let res = idb.result;
+          res.createObjectStore("notes", { autoIncrement: true });
+        };
+      });
 
-    <script src="script.js"></script>
+      let addNote = () => {
+        let newTitle = document.getElementById("add-note-title").value;
+        let newContent = document.getElementById("add-note-content").value;
+        let date = new Date();
+        var newDateTime = date.toLocaleString();
+
+        let idb = indexedDB.open("notes-editor", 1);
+
+        idb.onsuccess = () => {
+          let res = idb.result;
+          let tx = res.transaction("notes", "readwrite");
+          let store = tx.objectStore("notes");
+
+          store.put({
+            Title: newTitle,
+            Content: newContent,
+            DateTime: newDateTime,
+          });
+        };
+      };
+    </script>
   </body>
 </html>
