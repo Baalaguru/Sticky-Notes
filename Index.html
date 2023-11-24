@@ -112,7 +112,6 @@
           res.createObjectStore("notes", { autoIncrement: true });
         };
       });
-
       let addNote = () => {
         let newTitle = document.getElementById("add-note-title").value;
         let newContent = document.getElementById("add-note-content").value;
@@ -120,6 +119,11 @@
         var newDateTime = date.toLocaleString();
 
         let idb = indexedDB.open("notes-editor", 1);
+
+        idb.onupgradeneeded = () => {
+          let res = idb.result;
+          res.createObjectStore("notes", { autoIncrement: true });
+        };
 
         idb.onsuccess = () => {
           let res = idb.result;
